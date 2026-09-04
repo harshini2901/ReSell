@@ -141,3 +141,11 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# ── ReSell-specific ───────────────────────────────────────────────────────────
+# Ensure nested .env files are always excluded (root rule covers these too, but be explicit)
+server/.env
+client/.env
+
+# Client production build
+client/dist/
