@@ -16,6 +16,7 @@ export default function SellPage() {
   const [loading, setLoading] = useState(false);
   const [detectingLocation, setDetectingLocation] = useState(false);
   const [error, setError] = useState('');
+  const [duplicateWarning, setDuplicateWarning] = useState(null);
   const navigate = useNavigate();
 
   const handleFileChange = (e) => {
@@ -61,6 +62,7 @@ export default function SellPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setDuplicateWarning(null);
     
     if (imageFiles.length === 0) {
       setError('Please select at least one image.');
@@ -92,7 +94,15 @@ export default function SellPage() {
       
       navigate('/my-listings');
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create listing');
+      if (err.response?.status === 409) {
+        setError(err.response.data.message);
+        setDuplicateWarning({
+          title: err.response.data.duplicateTitle,
+          image: err.response.data.duplicateImage
+        });
+      } else {
+        setError(err.response?.data?.message || 'Failed to create listing');
+      }
     } finally {
       setLoading(false);
     }
@@ -169,6 +179,16 @@ export default function SellPage() {
         </div>
 
         {error && <p style={{ color: '#ef4444', background: '#fef2f2', padding: '1rem', borderRadius: '12px' }}>{error}</p>}
+        
+        {duplicateWarning && (
+          <div style={{ padding: '1rem', background: 'var(--surface-solid)', border: '1px solid #ef4444', borderRadius: '12px', display: 'flex', gap: '1rem', alignItems: 'center' }}>
+            <img src={duplicateWarning.image} alt="Duplicate" style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px' }} />
+            <div>
+              <strong style={{ color: '#ef4444' }}>Matched Listing:</strong>
+              <p style={{ margin: '0.2rem 0 0 0', color: 'var(--text-main)' }}>{duplicateWarning.title}</p>
+            </div>
+          </div>
+        )}
         
         <button type="submit" disabled={loading} className="btn-primary" style={{ marginTop: '1rem', padding: '1.2rem', fontSize: '1.1rem' }}>
           {loading ? 'Uploading...' : 'Create Listing'}

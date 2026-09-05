@@ -35,6 +35,9 @@ const listingSchema = new mongoose.Schema(
       type: [String],
       validate: [v => v.length > 0, 'At least one image is required'],
     },
+    imageHashes: {
+      type: [String], // Array of 64-bit binary strings (perceptual hashes)
+    },
     sellerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',

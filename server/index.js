@@ -22,6 +22,23 @@ app.get('/', (req, res) => {
 
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/listings', require('./routes/listings'));
+app.use('/api/chat', require('./routes/chat'));
+
+const http = require('http');
+const { Server } = require('socket.io');
+const setupSocket = require('./socket');
+
+// ── Create Server & Attach Socket.io ──────────────────────────────────────────
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    methods: ['GET', 'POST']
+  }
+});
+
+// Initialize socket handlers
+setupSocket(io);
 
 // ── MongoDB connection ────────────────────────────────────────────────────────
 const connectDB = async () => {
@@ -38,7 +55,7 @@ const connectDB = async () => {
 const PORT = process.env.PORT || 5000;
 
 connectDB().then(() => {
-  app.listen(PORT, () => {
+  server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
 });

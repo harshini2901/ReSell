@@ -67,7 +67,17 @@ export default function ListingDetail() {
               {listing.location && <p style={{ margin: 0, fontSize: '0.85rem', color: '#666' }}>📍 {listing.location}</p>}
             </div>
             
-            <button style={{ background: '#646cff', color: 'white', padding: '0.7rem 1.5rem' }}>
+            <button 
+              onClick={async () => {
+                try {
+                  await api.post('/api/chat', { listingId: listing._id });
+                  navigate('/chat');
+                } catch (err) {
+                  alert(err.response?.data?.message || 'Failed to start chat');
+                }
+              }}
+              style={{ background: '#646cff', color: 'white', padding: '0.7rem 1.5rem', border: 'none', borderRadius: '12px', cursor: 'pointer', fontWeight: 'bold' }}
+            >
               Message Seller
             </button>
           </div>
